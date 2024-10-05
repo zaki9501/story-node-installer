@@ -30,6 +30,11 @@ fi
 # Install Cosmovisor
 go install cosmossdk.io/tools/cosmovisor/cmd/cosmovisor@v1.6.0
 
+# Set required environment variables for Cosmovisor
+export DAEMON_NAME=story
+export DAEMON_HOME=$HOME/.story/story
+export DAEMON_DATA_BACKUP_DIR=$HOME/.story/story/data/backups
+
 # Verify Cosmovisor installation
 if ! cosmovisor version; then
   echo "Cosmovisor installation failed. Exiting..."
@@ -124,5 +129,6 @@ echo "===================================="
 echo "✅ Installation complete!"
 echo "✅ Story Node and Execution Client are successfully set up and running!"
 echo "===================================="
+
 
 
