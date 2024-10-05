@@ -35,6 +35,16 @@ export DAEMON_NAME=story
 export DAEMON_HOME=$HOME/.story/story
 export DAEMON_DATA_BACKUP_DIR=$HOME/.story/story/data/backups
 
+# Make environment variables persistent
+echo 'export DAEMON_NAME=story' >> ~/.bashrc
+echo 'export DAEMON_HOME=$HOME/.story/story' >> ~/.bashrc
+echo 'export DAEMON_DATA_BACKUP_DIR=$HOME/.story/story/data/backups' >> ~/.bashrc
+source ~/.bashrc
+
+# Create necessary directories for Cosmovisor
+mkdir -p $DAEMON_HOME/cosmovisor/genesis/bin
+mkdir -p $DAEMON_DATA_BACKUP_DIR
+
 # Verify Cosmovisor installation
 if ! cosmovisor version; then
   echo "Cosmovisor installation failed. Exiting..."
@@ -49,13 +59,12 @@ cd story
 git checkout v0.10.1
 go build -o story ./client
 
-# Prepare binaries for Cosmovisor
-mkdir -p $HOME/.story/story/cosmovisor/genesis/bin
-mv story $HOME/.story/story/cosmovisor/genesis/bin/
+# Move the binary to the appropriate Cosmovisor directory
+mv story $DAEMON_HOME/cosmovisor/genesis/bin/
 
 # Create application symlinks
-sudo ln -s $HOME/.story/story/cosmovisor/genesis $HOME/.story/story/cosmovisor/current -f
-sudo ln -s $HOME/.story/story/cosmovisor/current/bin/story /usr/local/bin/story -f
+sudo ln -s $DAEMON_HOME/cosmovisor/genesis $DAEMON_HOME/cosmovisor/current -f
+sudo ln -s $DAEMON_HOME/cosmovisor/current/bin/story /usr/local/bin/story -f
 
 # Download and build Execution Client binaries
 cd $HOME
@@ -78,10 +87,10 @@ ExecStart=$(which cosmovisor) run start
 Restart=on-failure
 RestartSec=10
 LimitNOFILE=65535
-Environment="DAEMON_HOME=$HOME/.story/story"
+Environment="DAEMON_HOME=$DAEMON_HOME"
 Environment="DAEMON_NAME=story"
 Environment="UNSAFE_SKIP_BACKUP=true"
-Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:$HOME/.story/story/cosmovisor/current/bin"
+Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:$DAEMON_HOME/cosmovisor/current/bin"
 
 [Install]
 WantedBy=multi-user.target
@@ -115,10 +124,10 @@ sudo systemctl enable story-testnet-geth.service
 story init --moniker "$MONIKER" --network iliad
 
 # Add seeds
-sed -i -e "s|^seeds *=.*|seeds = \"3f472746f46493309650e5a033076689996c8881@story-testnet.rpc.kjnodes.com:26659\"|" $HOME/.story/story/config/config.toml
+sed -i -e "s|^seeds *=.*|seeds = \"3f472746f46493309650e5a033076689996c8881@story-testnet.rpc.kjnodes.com:26659\"|" $DAEMON_HOME/config/config.toml
 
 # Make geth directory
-mkdir -p $HOME/.story/geth
+mkdir -p $DAEMON_HOME/geth
 
 # Start the services
 sudo systemctl start story-testnet-geth.service
@@ -129,6 +138,3 @@ echo "===================================="
 echo "✅ Installation complete!"
 echo "✅ Story Node and Execution Client are successfully set up and running!"
 echo "===================================="
-
-
-
