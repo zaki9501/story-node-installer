@@ -45,13 +45,7 @@ source ~/.bashrc
 mkdir -p $DAEMON_HOME/cosmovisor/genesis/bin
 mkdir -p $DAEMON_DATA_BACKUP_DIR
 
-# Verify Cosmovisor installation
-if ! cosmovisor version; then
-  echo "Cosmovisor installation failed. Exiting..."
-  exit 1
-fi
-
-# Download and build Consensus Client binaries
+# Build Story binary
 cd $HOME
 rm -rf story
 git clone https://github.com/piplabs/story.git
@@ -62,18 +56,20 @@ go build -o story ./client
 # Move the binary to the appropriate Cosmovisor directory
 mv $HOME/story/story $DAEMON_HOME/cosmovisor/genesis/bin/
 
-# Create application symlinks
-sudo ln -s $DAEMON_HOME/cosmovisor/genesis $DAEMON_HOME/cosmovisor/current -f
-sudo ln -s $DAEMON_HOME/cosmovisor/current/bin/story /usr/local/bin/story -f
+# Verify that the binary is in the correct directory
+if [ ! -f "$DAEMON_HOME/cosmovisor/genesis/bin/story" ]; then
+  echo "Story binary not found in the correct directory. Exiting..."
+  exit 1
+fi
 
-# Download and build Execution Client binaries
-cd $HOME
-rm -rf story-geth
-git clone https://github.com/piplabs/story-geth.git
-cd story-geth
-git checkout v0.9.3
-make geth
-sudo mv build/bin/geth /usr/local/bin/
+# Ensure the binary is executable
+chmod +x $DAEMON_HOME/cosmovisor/genesis/bin/story
+
+# Verify Cosmovisor installation
+if ! cosmovisor version; then
+  echo "Cosmovisor installation failed. Exiting..."
+  exit 1
+fi
 
 # Create Story node service
 sudo tee /etc/systemd/system/story-testnet.service > /dev/null << EOF
@@ -138,3 +134,4 @@ echo "===================================="
 echo "✅ Installation complete!"
 echo "✅ Story Node and Execution Client are successfully set up and running!"
 echo "===================================="
+
