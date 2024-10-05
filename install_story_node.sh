@@ -3,14 +3,15 @@
 # Install figlet for banner display
 sudo apt-get install -y figlet
 
-# Display banner with your name
+# Display "piki-node" in big letters
 figlet "piki-node"
 
-# Ask user for the node moniker
+# Ask the user for the node moniker
 read -p "Enter your node moniker: " MONIKER
 
 # Update system and install build tools
-sudo apt -q update && sudo apt -qy install curl git jq lz4 build-essential && sudo apt -qy upgrade
+sudo apt -q update && sudo apt -qy upgrade
+sudo apt -qy install curl git jq lz4 build-essential
 
 # Install Go
 sudo rm -rf /usr/local/go
@@ -48,10 +49,10 @@ sudo mv build/bin/geth /usr/local/bin/
 # Install Cosmovisor
 go install cosmossdk.io/tools/cosmovisor/cmd/cosmovisor@v1.6.0
 
-# Create Story Node service
+# Create Story node service
 sudo tee /etc/systemd/system/story-testnet.service > /dev/null << EOF
 [Unit]
-Description=story node service
+Description=Story node service
 After=network-online.target
 
 [Service]
@@ -68,6 +69,7 @@ Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/
 [Install]
 WantedBy=multi-user.target
 EOF
+
 sudo systemctl daemon-reload
 sudo systemctl enable story-testnet.service
 
@@ -88,25 +90,27 @@ LimitNOFILE=65535
 [Install]
 WantedBy=multi-user.target
 EOF
+
 sudo systemctl daemon-reload
 sudo systemctl enable story-testnet-geth.service
 
-# Initialize the node with the entered moniker
+# Initialize the node with the provided moniker
 story init --moniker "$MONIKER" --network iliad
 
-# Add seeds to config
+# Add seeds
 sed -i -e "s|^seeds *=.*|seeds = \"3f472746f46493309650e5a033076689996c8881@story-testnet.rpc.kjnodes.com:26659\"|" $HOME/.story/story/config/config.toml
 
-# Create Geth directory
+# Make geth directory
 mkdir -p $HOME/.story/geth
 
 # Start the services
 sudo systemctl start story-testnet-geth.service
 sudo systemctl start story-testnet.service
 
-# Print success message
+# Display success message
 echo "===================================="
 echo "✅ Installation complete!"
 echo "✅ Story Node and Execution Client are successfully set up and running!"
 echo "===================================="
+
 
