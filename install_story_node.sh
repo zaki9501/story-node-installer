@@ -21,6 +21,21 @@ echo 'export PATH=$PATH:$HOME/go/bin' | tee -a $HOME/.profile
 source /etc/profile.d/golang.sh
 source $HOME/.profile
 
+# Verify Go installation
+if ! go version; then
+  echo "Go installation failed. Exiting..."
+  exit 1
+fi
+
+# Install Cosmovisor
+go install cosmossdk.io/tools/cosmovisor/cmd/cosmovisor@v1.6.0
+
+# Verify Cosmovisor installation
+if ! cosmovisor version; then
+  echo "Cosmovisor installation failed. Exiting..."
+  exit 1
+fi
+
 # Download and build Consensus Client binaries
 cd $HOME
 rm -rf story
@@ -45,9 +60,6 @@ cd story-geth
 git checkout v0.9.3
 make geth
 sudo mv build/bin/geth /usr/local/bin/
-
-# Install Cosmovisor
-go install cosmossdk.io/tools/cosmovisor/cmd/cosmovisor@v1.6.0
 
 # Create Story node service
 sudo tee /etc/systemd/system/story-testnet.service > /dev/null << EOF
