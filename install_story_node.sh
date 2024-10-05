@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Install figlet for banner display
+sudo apt-get install -y figlet
+
+# Display "piki-node" in big letters
+figlet "piki-node"
+
 # Update system and install dependencies
 sudo apt update && sudo apt upgrade -y
 sudo apt install curl git wget htop tmux build-essential jq make lz4 gcc unzip -y
