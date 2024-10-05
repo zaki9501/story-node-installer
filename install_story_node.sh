@@ -60,7 +60,7 @@ git checkout v0.10.1
 go build -o story ./client
 
 # Move the binary to the appropriate Cosmovisor directory
-mv story $DAEMON_HOME/cosmovisor/genesis/bin/
+mv $HOME/story/story $DAEMON_HOME/cosmovisor/genesis/bin/
 
 # Create application symlinks
 sudo ln -s $DAEMON_HOME/cosmovisor/genesis $DAEMON_HOME/cosmovisor/current -f
