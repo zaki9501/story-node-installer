@@ -1,7 +1,13 @@
 #!/bin/bash
 
-# Set the moniker for the node (replace YOUR_MONIKER_GOES_HERE with your node name)
-MONIKER="YOUR_MONIKER_GOES_HERE"
+# Install figlet for banner display
+sudo apt-get install -y figlet
+
+# Display banner with your name
+figlet "piki-node"
+
+# Ask user for the node moniker
+read -p "Enter your node moniker: " MONIKER
 
 # Update system and install build tools
 sudo apt -q update && sudo apt -qy install curl git jq lz4 build-essential && sudo apt -qy upgrade
@@ -85,8 +91,8 @@ EOF
 sudo systemctl daemon-reload
 sudo systemctl enable story-testnet-geth.service
 
-# Initialize the node
-story init --moniker $MONIKER --network iliad
+# Initialize the node with the entered moniker
+story init --moniker "$MONIKER" --network iliad
 
 # Add seeds to config
 sed -i -e "s|^seeds *=.*|seeds = \"3f472746f46493309650e5a033076689996c8881@story-testnet.rpc.kjnodes.com:26659\"|" $HOME/.story/story/config/config.toml
@@ -98,4 +104,9 @@ mkdir -p $HOME/.story/geth
 sudo systemctl start story-testnet-geth.service
 sudo systemctl start story-testnet.service
 
-echo "Story Node and Execution Client have been successfully set up and started!"
+# Print success message
+echo "===================================="
+echo "✅ Installation complete!"
+echo "✅ Story Node and Execution Client are successfully set up and running!"
+echo "===================================="
+
