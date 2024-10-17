@@ -34,9 +34,9 @@ cd $HOME
 rm -rf bin
 mkdir bin
 cd bin
-wget https://story-geth-binaries.s3.us-west-1.amazonaws.com/geth-public/geth-linux-amd64-0.9.3-b224fdf.tar.gz
-tar -xvzf geth-linux-amd64-0.9.3-b224fdf.tar.gz
-mv ~/bin/geth-linux-amd64-0.9.3-b224fdf/geth ~/go/bin/
+wget https://story-geth-binaries.s3.us-west-1.amazonaws.com/geth-public/geth-linux-amd64-0.9.4-b224fdf.tar.gz
+tar -xvzf geth-linux-amd64-0.9.4-b224fdf.tar.gz
+mv ~/bin/geth-linux-amd64-0.9.4-b224fdf/geth ~/go/bin/
 mkdir -p ~/.story/story
 mkdir -p ~/.story/geth
 
